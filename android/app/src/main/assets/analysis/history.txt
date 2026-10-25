@@ -1,0 +1,71 @@
+history 源码分析
+HistoryClient 提供详情、分页跑步/室内记录、日历和看板读取。详情模型按 status=1 且 unCompleteReason=0 计算 is_valid；CLI 的 history_record_status 另检查 complete/isValid，二者判断并不完全一致。详情未查到返回 None，不应认定已入账。
+说明：索引基于 AST；不执行模块，不调用远端接口。参数列出名称、类型及默认值是否存在；字符串默认值不展示，避免散播协议常量。
+
+文件：协议/7.3.92/history/__init__.py
+导入依赖：history.client, history.models
+
+文件：协议/7.3.92/history/cli.py
+导入依赖：argparse, history.client, json, os, sys
+main() → 源码未标注类型，见返回分支（L19）
+调用：HistoryClient, argparse.ArgumentParser, cal_res.get, client.get_calendar_list, client.get_one_record, client.get_run_records, isinstance, it.get, len, parser.add_argument, parser.parse_args, print, records_res.get, records_res['data'].get
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+
+文件：协议/7.3.92/history/client.py
+导入依赖：core.client, datetime, history.config, history.models, os, sys, typing
+类 HistoryClient（L25），父类：BaseNetSecClient
+HistoryClient.__init__(self, uid: Optional[Union[int, str]] = None, token: Optional[str] = None, unid: Optional[Union[int, str]] = None, device_config: Optional[Dict[str, Any]] = None) → 源码未标注类型，见返回分支（L28）
+调用：super, super().__init__
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+HistoryClient.get_one_record(self, rrid: int) → Optional[RunRecordDetail]（L35）
+功能：单次运动结算详情回查 (/api/v70320/runnings/get_one_record)
+输出表达式（静态）：None; RunRecordDetail.from_api_data(res['data'])
+调用：RunRecordDetail.from_api_data, int, isinstance, res.get, self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+HistoryClient.get_run_records(self, page_num: int = 1, page_size: int = 20, sid: int = 0, sport_type: int = 1) → dict（L43）
+功能：分页查询跑步历史列表 (/api/v70230/runnings/records)
+输出表达式（静态）：self.execute_request('POST', URL_RUN_RECORDS, body_plain=body)
+调用：int, self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+HistoryClient.get_indoor_records(self, page_num: int = 1, page_size: int = 20, sid: int = 0) → dict（L53）
+功能：分页查询室内运动记录 (/api/v74/runnings/indoor/findForPage)
+输出表达式（静态）：self.execute_request('POST', URL_INDOOR_RECORDS, body_plain=body)
+调用：int, self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+HistoryClient.get_calendar_list(self, year: Optional[int] = None, month: Optional[int] = None) → dict（L62）
+功能：打卡日历列表查询 (/api/v70100/run/calendar/list)
+输出表达式（静态）：self.execute_request('POST', URL_CALENDAR_LIST, body_plain=body)
+调用：datetime.datetime.now, int, self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+HistoryClient.get_history_config(self) → dict（L70）
+功能：历史记录配置项查询 (/api/v70100/run/getHistoryConfig)
+输出表达式（静态）：self.execute_request('GET', URL_HISTORY_CONFIG)
+调用：self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+HistoryClient.get_data_index(self, sport_type: int = 1) → dict（L74）
+功能：数据索引看板查询 (/api/v70100/run/data/index)
+输出表达式（静态）：self.execute_request('GET', f'{URL_RUN_DATA_INDEX}?type={sport_type}')
+调用：self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+
+文件：协议/7.3.92/history/config.py
+导入依赖：core.config, os, sys
+
+文件：协议/7.3.92/history/models.py
+导入依赖：dataclasses, json, typing
+类 RunRecordDetail（L7），父类：无
+数据字段：rrid: int; sport_type: int; total_distance: float; valid_distance: float; total_time: int; valid_time: int; calorie: int; status: int; is_valid: bool; uncomplete_reason: int; start_time: int; stop_time: int; avg_speed: str; avg_step_freq: int; raw: Dict[str, Any]
+RunRecordDetail.from_api_data(cls, data: Dict[str, Any]) → 'RunRecordDetail'（L26）
+输出表达式（静态）：cls(rrid=int(data.get('rrid', 0) or data.get('id', 0)), sport_type=int(data.get('sportType', 1)), total_distance=float(data.get('totalDis', 0.0) or da
+调用：cls, data.get, float, int, str
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+parse_history_records(data) → 源码未标注类型，见返回分支（L49）
+功能：Accept the current list response and the older recordList envelope.
+输出表达式（静态）：[]; data
+调用：ValueError, any, isinstance, json.loads
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：ValueError
+history_record_status(record) → 源码未标注类型，见返回分支（L67）
+功能：A normal status alone does not establish that the run was completed.
+输出表达式（静态）：'未达标'; '达标'; f"状态码={record.get('status')}"
+调用：record.get
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无

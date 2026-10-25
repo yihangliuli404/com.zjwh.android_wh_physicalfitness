@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="cn.local.fitness.RecordCodecTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-10-25T07:16:25" hostname="ce039c497676" time="0.165">
+  <properties/>
+  <testcase name="jsonAndCsvAcceptUtf8Bom" classname="cn.local.fitness.RecordCodecTest" time="0.03"/>
+  <testcase name="csvRejectsMismatchedRecordMetadata" classname="cn.local.fitness.RecordCodecTest" time="0.031"/>
+  <testcase name="importNeverUpgradesProvenanceAndRetainsSimulatedLabel" classname="cn.local.fitness.RecordCodecTest" time="0.001"/>
+  <testcase name="emptyExportsCanBeRead" classname="cn.local.fitness.RecordCodecTest" time="0.0"/>
+  <testcase name="csvRoundTripPreservesAllFieldsAndPoints" classname="cn.local.fitness.RecordCodecTest" time="0.054"/>
+  <testcase name="unsupportedSchemaVersionIsRejected" classname="cn.local.fitness.RecordCodecTest" time="0.01"/>
+  <testcase name="separateImportsHaveIndependentIds" classname="cn.local.fitness.RecordCodecTest" time="0.0"/>
+  <testcase name="badCsvHeaderAndColumnCountAreRejected" classname="cn.local.fitness.RecordCodecTest" time="0.001"/>
+  <testcase name="csvSupportsChineseQuotesCommasAndNewlines" classname="cn.local.fitness.RecordCodecTest" time="0.001"/>
+  <testcase name="invalidDataIsRejectedBeforeImport" classname="cn.local.fitness.RecordCodecTest" time="0.002"/>
+  <testcase name="spreadsheetFormulaTitlesAreEscapedAndReversible" classname="cn.local.fitness.RecordCodecTest" time="0.001"/>
+  <testcase name="unclosedQuotesAndTrailingCharactersAreRejected" classname="cn.local.fitness.RecordCodecTest" time="0.001"/>
+  <testcase name="jsonRoundTripPreservesAllFieldsAndPoints" classname="cn.local.fitness.RecordCodecTest" time="0.025"/>
+  <testcase name="malformedJsonAndUnknownSourceAreRejected" classname="cn.local.fitness.RecordCodecTest" time="0.007"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

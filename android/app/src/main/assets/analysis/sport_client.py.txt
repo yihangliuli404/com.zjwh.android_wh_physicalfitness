@@ -1,0 +1,85 @@
+sport_client.py 源码分析
+SportClient792 门面注入 login/profile/policy/running/history/telemetry/ads；登录成功后下发凭据。execute_run 委托 RunningClient。部分 telemetry 委托把门面当 BaseNetSecClient 使用，类型能力不匹配。这里只作静态分析。
+说明：索引基于 AST；不执行模块，不调用远端接口。参数列出名称、类型及默认值是否存在；字符串默认值不展示，避免散播协议常量。
+
+文件：协议/7.3.92/sport_client.py
+导入依赖：ads.client, ads.models, core.config, history.client, history.models, login.client, login.models, os, policy.client, policy.models, profile.client, profile.models, running.client, running.models, sys, telemetry.client, typing
+类 SportClient792（L25），父类：无
+SportClient792.__init__(self, uid: Optional[Union[int, str]] = None, token: Optional[str] = None, unid: Optional[Union[int, str]] = None, device_config: Optional[Dict[str, Any]] = None) → 源码未标注类型，见返回分支（L28）
+调用：AdClient, HistoryClient, LoginClient, PolicyClient, ProfileClient, RunningClient, TelemetryClient, load_customer_device, [外部服务地址省略]ice_config.update, str
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+SportClient792.set_credentials(self, uid: Union[int, str], token: str, unid: Optional[Union[int, str]] = None) → 源码未标注类型，见返回分支（L50）
+功能：更新当前客户端上下文中的认证凭据
+调用：self.ads.set_credentials, self.history.set_credentials, self.policy.set_credentials, self.profile.set_credentials, self.running.set_credentials, str
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+SportClient792.login(self, username: str, password: str, progress_callback: Optional[Callable[[str], None]] = None) → LoginResult（L63）
+功能：全自动登录 (checkGeeUse -> 极验 v4 无头识别与拟人滑动 -> geevalidate -> login)
+输出表达式（静态）：res
+调用：self.login_client.login, self.set_credentials
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+SportClient792.sync_server_time(self) → ServerTime（L71）
+输出表达式（静态）：self.profile.get_server_time()
+调用：self.profile.get_server_time
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+SportClient792.get_user_profile(self) → Optional[UserProfileDetails]（L74）
+输出表达式（静态）：self.profile.get_user_info()
+调用：self.profile.get_user_info
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+SportClient792.get_run_policy(self, run_mode: int = 1) → Optional[RunRule]（L78）
+输出表达式（静态）：self.policy.get_run_policy(run_mode=run_mode)
+调用：self.policy.get_run_policy
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+SportClient792.get_geo_fences(self) → list（L81）
+输出表达式（静态）：self.policy.get_geo_fence()
+调用：self.policy.get_geo_fence
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+SportClient792.get_semester_progress(self, run_mode: int = 1) → Optional[SemesterInfo]（L84）
+输出表达式（静态）：self.policy.get_semester_info(run_mode=run_mode)
+调用：self.policy.get_semester_info
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+SportClient792.execute_run(self, target_distance_m: int = 2150, target_time_sec: int = 760, sport_type: int = 1, progress_callback: Optional[Callable[[str], None]] = None) → RunningSubmissionResult（L88）
+功能：全时序拟人跑步提交流程： - sport_type=1: 计分跑（校园考核，强制经过 5 个必经打卡点与围栏范围）； - sport_type=6: 自由跑（阳光跑，自由路线，无需必经打卡点）。
+输出表达式（静态）：self.running.execute_full_run(target_distance_m=target_distance_m, target_time_sec=target_time_sec, sport_type=sport_type, progress_callback=progress_
+调用：self.running.execute_full_run
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+SportClient792.watch_ad(self, ad_position: str = 字符串默认值, duration_sec: int = 15, progress_callback: Optional[Callable[[str], None]] = None) → AdWatchResult（L106）
+功能：模拟看广告与激励视频全流程： - ad_position="4": 激励视频 (运动完成奖励或看广告加倍)； - ad_position="2": 开屏/首页弹窗广告； - ad_position="1": 信息流 Banner 广告。
+输出表达式（静态）：self.ads.simulate_watch_ad(ad_position=ad_position, duration_sec=duration_sec, progress_callback=progress_callback)
+调用：self.ads.simulate_watch_ad
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+SportClient792.get_run_record_detail(self, rrid: int) → Optional[RunRecordDetail]（L123）
+输出表达式（静态）：self.history.get_one_record(rrid=rrid)
+调用：self.history.get_one_record
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+SportClient792.get_history_records(self, page_num: int = 1, page_size: int = 20) → dict（L126）
+输出表达式（静态）：self.history.get_run_records(page_num=page_num, page_size=page_size)
+调用：self.history.get_run_records
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+SportClient792.get_calendar(self, year: Optional[int] = None, month: Optional[int] = None) → dict（L129）
+输出表达式（静态）：self.history.get_calendar_list(year=year, month=month)
+调用：self.history.get_calendar_list
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+SportClient792.get_cheat_blacklist(self) → dict（L133）
+输出表达式（静态）：self.telemetry.get_cheat_blacklist(self)
+调用：self.telemetry.get_cheat_blacklist
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+SportClient792.get_barrier_free_policy(self) → dict（L136）
+输出表达式（静态）：self.telemetry.get_barrier_free_policy(self)
+调用：self.telemetry.get_barrier_free_policy
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+SportClient792.get_ranks(self, rank_type: int = 1) → dict（L139）
+输出表达式（静态）：self.telemetry.get_rank_list(self, rank_type=rank_type)
+调用：self.telemetry.get_rank_list
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+SportClient792.get_credit_popup(self) → dict（L142）
+输出表达式（静态）：self.telemetry.get_credit_popup(self)
+调用：self.telemetry.get_credit_popup
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+SportClient792.warmup_home(self) → dict（L146）
+输出表达式（静态）：self.profile.warmup_dashboard_session()
+调用：self.profile.warmup_dashboard_session
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+SportClient792.get_distance_route(self, sport_type: int = 1, distance_m: int = 1000, latitude: Optional[float] = None, longitude: Optional[float] = None, run_area_id: int = -1) → dict（L149）
+输出表达式（静态）：self.policy.get_distance_route_points(sport_type=sport_type, distance_m=distance_m, latitude=latitude, longitude=longitude, run_area_id=run_area_id)
+调用：self.policy.get_distance_route_points
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无

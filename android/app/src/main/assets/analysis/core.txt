@@ -1,0 +1,101 @@
+core 源码分析
+公共设备上下文、请求头签名、NetSec 加解密与 urllib 传输。execute_request 的网络段捕获 HTTPError/Exception，返回错误字典；构造头部发生在 try 外，仍可抛异常。静态分析，不集成真实接口。
+说明：索引基于 AST；不执行模块，不调用远端接口。参数列出名称、类型及默认值是否存在；字符串默认值不展示，避免散播协议常量。
+
+文件：协议/7.3.92/core/__init__.py
+导入依赖：core.client, core.config, core.crypto
+
+文件：协议/7.3.92/core/client.py
+导入依赖：base64, core.config, core.crypto, json, ssl, time, typing, urllib.request, uuid
+类 BaseNetSecClient（L14），父类：无
+BaseNetSecClient.__init__(self, uid: Optional[Union[int, str]] = None, token: Optional[str] = None, unid: Optional[Union[int, str]] = None, device_config: Optional[Dict[str, Any]] = None) → 源码未标注类型，见返回分支（L17）
+调用：NetSecClient, load_customer_device, [外部服务地址省略]ice_config.update, ssl.create_default_context, str
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+BaseNetSecClient.set_credentials(self, uid: Optional[Union[int, str]], token: Optional[str], unid: Optional[Union[int, str]] = None) → 源码未标注类型，见返回分支（L34）
+功能：动态设置或更新鉴权凭据
+调用：str
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+BaseNetSecClient.build_headers(self, custom_headers: Optional[Dict[str, str]] = None, sign_params: Optional[Dict[str, str]] = None) → tuple（L43）
+功能：组装标准请求头并计算 headerSign 与 tokenSign
+输出表达式（静态）：(headers, h_resp_key)
+调用：compute_token_sign, dict, headers.update, int, json.dumps, self.crypto.encrypt_request, sign_dict.update, str, time.time, uuid.uuid4
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+BaseNetSecClient.execute_request(self, method: str, url: str, body_plain: Optional[Union[dict, list]] = None, custom_headers: Optional[Dict[str, str]] = None, sign_params: Optional[Dict[str, str]] = None, timeout: int = 20) → Any（L78）
+功能：发送加密网络请求并自动解密返回响应
+输出表达式（静态）：biz_bytes.decode('utf-8', errors='replace'); inner; json.loads(biz_bytes.decode('utf-8', errors='replace')); json.loads(err_body); resp_obj; {'error': -1, 'message': str(e)}; {'error': e.code, 'message': f'HTTP Error {e.code}: {e.reason}', 'raw': err_body}
+调用：aes128_cbc_decrypt, base64.b64decode, biz_bytes.decode, dec_h.decode, e.read, e.read().decode, json.dumps, json.dumps(b_wire, separators=(',', ':')).encode, json.loads, method.upper, resp.read, resp.read().decode, self.build_headers, self.crypto.encrypt_request, str, urllib.request.Request, urllib.request.urlopen
+本函数捕获：Exception, urllib.error.HTTPError；显式抛出：无
+
+文件：协议/7.3.92/core/config.py
+导入依赖：json, os, uuid
+load_customer_device(config_path: str = None) → dict（L28）
+输出表达式（静态）：dev
+调用：cfg.get, cfg.get('setting', {}).get, dict, json.load, open, os.path.exists, phone.get, phone['vdid'].replace, uuid.uuid4
+本函数捕获：Exception；显式抛出：无
+
+文件：协议/7.3.92/core/crypto.py
+导入依赖：base64, collections, hashlib, json, os, pathlib, random, struct, subprocess, time, uuid
+xtime(a) → 源码未标注类型，见返回分支（L38）
+输出表达式（静态）：(a << 1 ^ 27) & 255 if a & 128 else a << 1 & 255
+调用：无显式函数调用
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+mul_gf(a, b) → 源码未标注类型，见返回分支（L41）
+输出表达式（静态）：res
+调用：range, xtime
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+key_expansion_128(key: bytes) → 源码未标注类型，见返回分支（L49）
+输出表达式（静态）：w
+调用：int.from_bytes, range, w.append
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+aes128_encrypt_block(block: bytes, round_keys) → 源码未标注类型，见返回分支（L63）
+输出表达式（静态）：bytes(state)
+调用：bytes, list, range, xtime
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+aes128_decrypt_block(block: bytes, round_keys) → 源码未标注类型，见返回分支（L100）
+输出表达式（静态）：bytes(state)
+调用：bytes, list, mul_gf, range
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+aes128_cbc_encrypt(data: bytes, key: bytes, iv: bytes = bytes(16)) → bytes（L137）
+输出表达式（静态）：bytes(out)
+调用：aes128_encrypt_block, bytearray, bytes, key_expansion_128, len, out.extend, range, zip
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+aes128_cbc_decrypt(data: bytes, key: bytes, iv: bytes = bytes(16)) → bytes（L150）
+输出表达式（静态）：bytes(out); bytes(out[:-pad_len])
+调用：aes128_decrypt_block, bytearray, bytes, key_expansion_128, len, out.extend, range, zip
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+rsa_pkcs1_v15_encrypt(msg: bytes, n: int, e: int, k_len: int = 128) → bytes（L165）
+输出表达式（静态）：c_int.to_bytes(k_len, 'big')
+调用：bytearray, bytes, c_int.to_bytes, int.from_bytes, len, os.urandom, pow, ps.append
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+_byte_hash(data: bytes) → int（L176）
+输出表达式（静态）：h
+调用：无显式函数调用
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+_feistel_transform(s0: int, s1: int, s2: int, s3: int) → 源码未标注类型，见返回分支（L182）
+输出表达式（静态）：(new_s0, new_s1, new_s2, new_s3)
+调用：无显式函数调用
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+_final_mix(s0: int, s1: int, s2: int, s3: int) → bytes（L196）
+输出表达式（静态）：struct.pack('<IIII', d, a, b, c)
+调用：struct.pack
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+response_kdf(kd1, kd2, kd3, kd4) → bytes（L206）
+输出表达式（静态）：_final_mix(s0, s1, s2, s3)
+调用：_byte_hash, _feistel_transform, _final_mix, isinstance, kd1.encode, kd2.encode, kd3.encode, kd4.encode
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+类 NetSecClient（L220），父类：无
+NetSecClient.__init__(self) → 源码未标注类型，见返回分支（L221）
+调用：base64.b64decode, int.from_bytes
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+NetSecClient.encrypt_request(self, data_obj) → 源码未标注类型，见返回分支（L229）
+输出表达式（静态）：(wire_req, resp_aes_key)
+调用：''.join, ''.join((random.choice('abcdefghijklmnopqrstuvwxyz0123456789') for _ in range(16))).encode, aes128_cbc_encrypt, base64.b64encode, base64.b64encode(ciphertext).decode, base64.b64encode(data_obj.encode('utf-8')).decode, base64.b64encode(enc_k).decode, base64.b64encode(json.dumps(data_obj, separators=(',', ':')).encode('utf-8')).decode, chr, collections.OrderedDict, data_obj.encode, hashlib.md5, hashlib.md5(inner_bytes).hexdigest, hashlib.md5(inner_bytes).hexdigest().lower, inner_json.encode, int, isinstance, json.dumps, json.dumps(data_obj, separators=(',', ':')).encode, random.choice, range, response_kdf, rsa_pkcs1_v15_encrypt, str, str(uuid.uuid4()).replace, time.time, uuid.uuid4
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+NetSecClient.decrypt_response(self, resp_dict, resp_aes_key) → 源码未标注类型，见返回分支（L272）
+输出表达式（静态）：biz_bytes.decode('utf-8', errors='replace'); json.loads(biz_bytes.decode('utf-8', errors='replace')); resp_dict
+调用：aes128_cbc_decrypt, base64.b64decode, biz_bytes.decode, decrypted.decode, json.loads
+本函数捕获：Exception；显式抛出：无
+compute_token_sign(params, salt = 字符串默认值) → 源码未标注类型，见返回分支（L285）
+输出表达式（静态）：hashlib.md5(s.encode('utf-8')).hexdigest().lower()
+调用：'&'.join, hashlib.md5, hashlib.md5(s.encode('utf-8')).hexdigest, hashlib.md5(s.encode('utf-8')).hexdigest().lower, k.lower, params.items, s.encode, str, valid_items.sort, x[0].lower
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无

@@ -1,0 +1,102 @@
+policy 源码分析
+读取跑步规则、围栏、学期和路线点；GeoPoint 校验有限数和范围，GCJ 锚点必须显式存在。点位请求捕获解析错误并记录 last_checkpoint_error；Android 不获取校园打卡点。
+说明：索引基于 AST；不执行模块，不调用远端接口。参数列出名称、类型及默认值是否存在；字符串默认值不展示，避免散播协议常量。
+
+文件：协议/7.3.92/policy/__init__.py
+导入依赖：policy.client, policy.models
+
+文件：协议/7.3.92/policy/cli.py
+导入依赖：argparse, os, policy.client, sys
+main() → 源码未标注类型，见返回分支（L18）
+调用：','.join, PolicyClient, argparse.ArgumentParser, client.get_geo_fence, client.get_run_policy, client.get_semester_info, enumerate, len, parser.add_argument, parser.parse_args, print
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+
+文件：协议/7.3.92/policy/client.py
+导入依赖：core.client, core.config, hashlib, json, os, policy.config, policy.models, sys, typing, uuid
+类 PolicyClient（L28），父类：BaseNetSecClient
+PolicyClient.__init__(self, uid: Optional[Union[int, str]] = None, token: Optional[str] = None, unid: Optional[Union[int, str]] = None, device_config: Optional[Dict[str, Any]] = None) → 源码未标注类型，见返回分支（L31）
+调用：super, super().__init__
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+PolicyClient.get_run_policy(self, run_mode: int = 1, unid: Optional[Union[int, str]] = None) → Optional[RunRule]（L41）
+功能：获取指定运动模式的跑步规则（配速、步频、单次/单日里程、有效时段等）
+输出表达式（静态）：None; RunRule.from_api_data(res['data'])
+调用：RunRule.from_api_data, int, isinstance, res.get, self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+PolicyClient.get_geo_fence(self, update_time: int = 0) → List[GeoFenceArea]（L57）
+功能：拉取学校围栏边界；实时点位由 get_run_checkpoints 单独获取。
+输出表达式（静态）：fences
+调用：GeoFenceArea.from_api_data, d.get, fences.append, isinstance, res.get, self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+PolicyClient.get_semester_info(self, run_mode: int = 1) → Optional[SemesterInfo]（L71）
+功能：查询学生本学期已完成公里数与剩余目标
+输出表达式（静态）：None; SemesterInfo.from_api_data(res['data'])
+调用：SemesterInfo.from_api_data, isinstance, res.get, self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+PolicyClient.get_semester_summary(self, sid: int = 0) → Dict[str, Any]（L81）
+功能：查询学期总体结算汇总
+输出表达式（静态）：self.execute_request('POST', URL_SEMESTER_SUMMARY, body_plain={'sid': sid})
+调用：self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+PolicyClient.get_run_goals(self) → Dict[str, Any]（L85）
+功能：查询本学期考核指标与目标
+输出表达式（静态）：self.execute_request('POST', URL_RUN_GOALS, body_plain={})
+调用：self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+PolicyClient.get_distance_route_points(self, sport_type: int = 1, distance_m: int = 1000, latitude: Optional[float] = None, longitude: Optional[float] = None, run_area_id: int = -1, uuid_str: Optional[str] = None, runec: str = 字符串默认值) → dict（L90）
+功能：Query point issuance with a GCJ anchor, not fence boundary points. Android requestFivePoint fixes the path key to 1. Source: Coaixy/android_wh_physicalfitness_analyse @ 91dc299a, classes CommonApiManager$requestFivePoint$1 and Utils.atlasSign.
+输出表达式（静态）：self.execute_request('POST', url, body_plain=body)
+调用：(url.replace('https://', 'http://', 1) + salt).encode, GeoPoint.from_api_data, ValueError, hashlib.md5, hashlib.md5((url.replace('https://', 'http://', 1) + salt).encode('utf-8')).hexdigest, int, isinstance, self.execute_request, str, url.replace, uuid.uuid4
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：ValueError
+PolicyClient.get_checkpoints_for_run(self, fence: GeoFenceArea, uuid_str: Optional[str] = None, rule: Optional[RunRule] = None) → List[GeoPoint]（L121）
+功能：Use the school minimum distance and selected area, as RunStartViewModel does.
+输出表达式（静态）：[]; self.get_run_checkpoints(rule.min_distance, latitude, longitude, area_id, uuid_str)
+调用：ValueError, area.get, fence.polygon_points[0].gcj_coordinates, int, len, rule.raw.get, self.get_run_checkpoints, self.get_run_policy
+本函数捕获：(TypeError, ValueError, KeyError, AttributeError)；显式抛出：ValueError
+PolicyClient.get_run_checkpoints(self, distance_m: int, latitude: float, longitude: float, run_area_id: int = -1, uuid_str: Optional[str] = None, runec: str = 字符串默认值) → List[GeoPoint]（L157）
+输出表达式（静态）：[]; points
+调用：GeoPoint.from_api_data, ValueError, data.get, isinstance, json.loads, result.get, self.get_distance_route_points
+本函数捕获：(TypeError, ValueError, KeyError)；显式抛出：ValueError
+
+文件：协议/7.3.92/policy/config.py
+导入依赖：core.config, os, sys
+
+文件：协议/7.3.92/policy/models.py
+导入依赖：dataclasses, json, math, typing
+类 FaceCheckConfig（L9），父类：无
+数据字段：enable: bool; check_point_min: int; check_point_max: int; check_run_valid_time: int; raw: Dict[str, Any]
+FaceCheckConfig.from_api_data(cls, data: Dict[str, Any]) → 'FaceCheckConfig'（L18）
+输出表达式（静态）：cls(); cls(enable=bool(data.get('enable', False)), check_point_min=int(data.get('checkPointMin', 0)), check_point_max=int(data.get('checkPointMax', 0)), chec
+调用：bool, cls, data.get, int
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+类 RunRule（L31），父类：无
+数据字段：day_goal: int; min_distance: int; speed_top: str; speed_bottom: str; step_top: Union[int, str]; step_bottom: Union[int, str]; valid_times: List[str]; face_check: FaceCheckConfig; raw: Dict[str, Any]
+RunRule.from_api_data(cls, data: Dict[str, Any]) → 'RunRule'（L44）
+输出表达式（静态）：cls(day_goal=int(rule.get('dayGoal', 0)), min_distance=int(rule.get('minDistance', 0)), speed_top=str(rule.get('speedTop', '-')), speed_bottom=str(rul
+调用：FaceCheckConfig.from_api_data, cls, data.get, int, rule.get, str, v_times.append, vt.get
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+类 GeoPoint（L74），父类：无
+数据字段：lat: float; lng: float; point_id: Optional[int]; name: Optional[str]; raw: Dict[str, Any]
+GeoPoint.from_api_data(cls, data) → 源码未标注类型，见返回分支（L83）
+输出表达式（静态）：cls(lat=lat, lng=lon, point_id=data.get('id'), name=data.get('pointName', data.get('name')), raw=dict(data))
+调用：ValueError, cls, data.get, dict, float, isinstance, math.isfinite
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：ValueError
+GeoPoint.gcj_coordinates(self) → 源码未标注类型，见返回分支（L95）
+输出表达式（静态）：(point.lat, point.lng)
+调用：GeoPoint.from_api_data, ValueError, self.raw.get
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：ValueError
+GeoPoint.as_checkpoint(self) → 源码未标注类型，见返回分支（L103）
+输出表达式（静态）：values
+调用：dict, values.update
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+类 GeoFenceArea（L110），父类：无
+数据字段：fence_id: int; fence_name: str; polygon_points: List[GeoPoint]; check_points: List[GeoPoint]; raw: Dict[str, Any]
+GeoFenceArea.from_api_data(cls, data: Dict[str, Any]) → 'GeoFenceArea'（L119）
+输出表达式（静态）：[GeoPoint.from_api_data(point) for point in values]; cls(fence_id=int(data.get('id', 0)), fence_name=str(data.get('name', '未命名围栏')), polygon_points=poly, check_points=checks, raw=data)
+调用：GeoPoint.from_api_data, ValueError, cls, data.get, int, isinstance, json.loads, parse, str
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：ValueError
+类 SemesterInfo（L142），父类：无
+数据字段：semester_name: str; total_completed_distance: float; valid_count: int; target_distance: float; remaining_distance: float; raw: Dict[str, Any]
+SemesterInfo.from_api_data(cls, data: Dict[str, Any]) → 'SemesterInfo'（L152）
+输出表达式（静态）：cls(semester_name=str(data.get('semesterName', '')), total_completed_distance=tot, valid_count=int(data.get('validCount', 0)), target_distance=tar, re
+调用：cls, data.get, float, int, max, str
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无

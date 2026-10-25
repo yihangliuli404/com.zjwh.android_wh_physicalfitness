@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="cn.local.fitness.MockProtocolTest" tests="23" skipped="0" failures="0" errors="0" timestamp="2026-10-25T07:16:24" hostname="ce039c497676" time="0.978">
+  <properties/>
+  <testcase name="queryForDifferentTaskCannotFindAnotherReceipt" classname="cn.local.fitness.MockProtocolTest" time="0.121"/>
+  <testcase name="settlementHttp200BusinessFailureDoesNotCredit" classname="cn.local.fitness.MockProtocolTest" time="0.024"/>
+  <testcase name="uploadDisconnectIsNetworkFailure" classname="cn.local.fitness.MockProtocolTest" time="0.008"/>
+  <testcase name="abnormalHistoryFilterIsExplicit" classname="cn.local.fitness.MockProtocolTest" time="0.003"/>
+  <testcase name="independentQueryTimeoutAndRejectionArePreserved" classname="cn.local.fitness.MockProtocolTest" time="0.161"/>
+  <testcase name="failedQueryCannotOverwriteUploadedAndSettledEvidence" classname="cn.local.fitness.MockProtocolTest" time="0.001"/>
+  <testcase name="uploadHttpRejectionDoesNotWriteLedger" classname="cn.local.fitness.MockProtocolTest" time="0.029"/>
+  <testcase name="malformedSettlementResponseIsNotSuccess" classname="cn.local.fitness.MockProtocolTest" time="0.019"/>
+  <testcase name="http200WithoutCompletedBusinessFlagIsOnlyAccepted" classname="cn.local.fitness.MockProtocolTest" time="0.002"/>
+  <testcase name="successfulSettlementCanStillHaveNoConfirmedCredit" classname="cn.local.fitness.MockProtocolTest" time="0.034"/>
+  <testcase name="uploadTimeoutHasNoFalseSuccess" classname="cn.local.fitness.MockProtocolTest" time="0.168"/>
+  <testcase name="settlement202IsAcceptedButIncomplete" classname="cn.local.fitness.MockProtocolTest" time="0.033"/>
+  <testcase name="receiptMustMatchTaskAndBePresent" classname="cn.local.fitness.MockProtocolTest" time="0.001"/>
+  <testcase name="closedServerIsTransportErrorNotBusinessFailure" classname="cn.local.fitness.MockProtocolTest" time="0.007"/>
+  <testcase name="fullMockFlowRequiresIndependentQueryForCredit" classname="cn.local.fitness.MockProtocolTest" time="0.035"/>
+  <testcase name="redirectsAreNotAcceptedAsSuccess" classname="cn.local.fitness.MockProtocolTest" time="0.0"/>
+  <testcase name="settlementCanFailToSendOrTimeOut" classname="cn.local.fitness.MockProtocolTest" time="0.223"/>
+  <testcase name="processInterruptionDoesNotPromoteOtherStages" classname="cn.local.fitness.MockProtocolTest" time="0.004"/>
+  <testcase name="uploadOnlyNeverMarksSettlementOrCreditSuccess" classname="cn.local.fitness.MockProtocolTest" time="0.014"/>
+  <testcase name="taskLogsAndReportsRoundTripWithoutCredentials" classname="cn.local.fitness.MockProtocolTest" time="0.02"/>
+  <testcase name="settlementHttpRejectionIsSeparateFromUpload" classname="cn.local.fitness.MockProtocolTest" time="0.026"/>
+  <testcase name="newTaskHasThreeIndependentUnsentStates" classname="cn.local.fitness.MockProtocolTest" time="0.0"/>
+  <testcase name="settlementWithoutUploadIsRejected" classname="cn.local.fitness.MockProtocolTest" time="0.031"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

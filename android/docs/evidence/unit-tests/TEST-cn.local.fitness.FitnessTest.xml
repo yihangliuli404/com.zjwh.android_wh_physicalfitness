@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="cn.local.fitness.FitnessTest" tests="17" skipped="0" failures="0" errors="0" timestamp="2026-10-25T07:16:24" hostname="ce039c497676" time="0.083">
+  <properties/>
+  <testcase name="inconsistentTrackCannotPassValidation" classname="cn.local.fitness.FitnessTest" time="0.031"/>
+  <testcase name="manualRecordHasNoFabricatedTrack" classname="cn.local.fitness.FitnessTest" time="0.0"/>
+  <testcase name="paceAndRoundingAreCorrect" classname="cn.local.fitness.FitnessTest" time="0.002"/>
+  <testcase name="coordinateBoundaryValuesAreAccepted" classname="cn.local.fitness.FitnessTest" time="0.0"/>
+  <testcase name="invalidTitlesAndDatesAreRejected" classname="cn.local.fitness.FitnessTest" time="0.001"/>
+  <testcase name="simulationIncludesEndpointsAndStrictTimes" classname="cn.local.fitness.FitnessTest" time="0.001"/>
+  <testcase name="haversineMatchesKnownEquatorialArc" classname="cn.local.fitness.FitnessTest" time="0.0"/>
+  <testcase name="antipodalDistanceIsFinite" classname="cn.local.fitness.FitnessTest" time="0.001"/>
+  <testcase name="invalidCoordinatesAreRejected" classname="cn.local.fitness.FitnessTest" time="0.009"/>
+  <testcase name="distanceIsSymmetricAndZeroForIdenticalPoints" classname="cn.local.fitness.FitnessTest" time="0.0"/>
+  <testcase name="oversizedOrDuplicateCollectionsAreRejected" classname="cn.local.fitness.FitnessTest" time="0.003"/>
+  <testcase name="simulationRejectsImpossibleInputs" classname="cn.local.fitness.FitnessTest" time="0.002"/>
+  <testcase name="simulationCannotLoseItsTrack" classname="cn.local.fitness.FitnessTest" time="0.0"/>
+  <testcase name="localCheckReportsFailureWithoutClaimingPlatformSuccess" classname="cn.local.fitness.FitnessTest" time="0.004"/>
+  <testcase name="antiMeridianUsesShortArc" classname="cn.local.fitness.FitnessTest" time="0.0"/>
+  <testcase name="simulationIsAlwaysMarkedAndWithinLengthTolerance" classname="cn.local.fitness.FitnessTest" time="0.003"/>
+  <testcase name="invalidTotalsAreRejected" classname="cn.local.fitness.FitnessTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

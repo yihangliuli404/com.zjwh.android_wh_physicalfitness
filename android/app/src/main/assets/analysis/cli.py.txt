@@ -1,0 +1,9 @@
+cli.py 源码分析
+main 用 argparse 选择登录、时间、档案、规则、点位、历史、广告及运动提交。未指定操作时默认同步时间，可能发出网络请求；原登录成功日志会打印 Token，不复用这类日志。Android 不执行原 CLI。
+说明：索引基于 AST；不执行模块，不调用远端接口。参数列出名称、类型及默认值是否存在；字符串默认值不展示，避免散播协议常量。
+
+文件：协议/7.3.92/cli.py
+导入依赖：argparse, history.models, os, sport_client, sys
+main() → 源码未标注类型，见返回分支（L17）
+调用：SportClient792, argparse.ArgumentParser, client.execute_run, client.get_geo_fences, client.get_history_records, client.get_run_policy, client.get_user_profile, client.login, client.policy.get_checkpoints_for_run, client.sync_server_time, client.watch_ad, h_res.get, history_record_status, isinstance, len, parse_history_records, parser.add_argument, parser.parse_args, print, r.get
+本函数捕获：(TypeError, ValueError)；显式抛出：无

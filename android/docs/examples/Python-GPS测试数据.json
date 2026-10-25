@@ -1,0 +1,5 @@
+[
+  {"lat":0,"lon":0,"time":1700000000000,"speed":0,"accuracy":3,"isValid":true},
+  {"lat":0,"lon":0.0001,"time":1700000000500,"speed":0,"accuracy":3,"isValid":true},
+  {"lat":0,"lon":0.001,"time":1700000002000,"speed":0,"accuracy":3,"isValid":true}
+]

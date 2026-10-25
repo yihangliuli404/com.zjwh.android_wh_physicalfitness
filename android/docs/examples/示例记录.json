@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "records": [
+    {
+      "id": "example-manual",
+      "title": "离线导入示例（非真实运动）",
+      "source": "MANUAL",
+      "startedAt": 1767225600000,
+      "durationSeconds": 600,
+      "distanceMeters": 2000.0,
+      "points": []
+    }
+  ]
+}

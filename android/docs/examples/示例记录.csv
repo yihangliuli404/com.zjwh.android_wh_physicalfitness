@@ -1,0 +1,2 @@
+id,title,source,startedAt,durationSeconds,distanceMeters,pointIndex,latitude,longitude,elapsedSeconds
+example-manual,离线导入示例（非真实运动）,MANUAL,1767225600000,600,2000.0,,,,

@@ -1,0 +1,60 @@
+telemetry 源码分析
+启动/页面/设备埋点、控制信令和风险/排行榜读取。_post_json 10 秒超时，控制信令 5 秒；失败变成 error=-1。四个委托读取函数要求传入有 execute_request 的对象。原 facade 传入自身但自身没有该方法，存在静态调用不匹配。Android 不上传遥测或广告。
+说明：索引基于 AST；不执行模块，不调用远端接口。参数列出名称、类型及默认值是否存在；字符串默认值不展示，避免散播协议常量。
+
+文件：协议/7.3.92/telemetry/__init__.py
+导入依赖：telemetry.client
+
+文件：协议/7.3.92/telemetry/client.py
+导入依赖：core.config, json, ssl, telemetry.config, time, typing, urllib.request
+类 TelemetryClient（L22），父类：无
+TelemetryClient.__init__(self, device_config: Optional[Dict[str, Any]] = None) → 源码未标注类型，见返回分支（L25）
+调用：load_customer_device, [外部服务地址省略]ice.update, ssl.create_default_context
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+TelemetryClient._post_json(self, url: str, payload: dict, custom_headers: Optional[dict] = None) → dict（L31）
+输出表达式（静态）：json.loads(resp.read().decode('utf-8')); {'error': -1, 'message': str(e)}
+调用：headers.update, json.dumps, json.dumps(payload, separators=(',', ':'), ensure_ascii=False).encode, json.loads, resp.read, resp.read().decode, str, urllib.request.Request, urllib.request.urlopen
+本函数捕获：Exception；显式抛出：无
+TelemetryClient.send_startup_pv(self, uid: int, unid: int, gender: int = 0) → dict（L47）
+功能：冷启动初始化埋点 (对齐 7.3.92 抓包格式)
+输出表达式（静态）：self._post_json(URL_STARTUP_PV, body)
+调用：int, self._post_json, [外部服务地址省略]ice.get
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+TelemetryClient.send_page_exposure(self, unid: int, items: Optional[List[str]] = None) → dict（L60）
+功能：页面曝光行为打点 (My_page_exposure 等)
+输出表达式（静态）：self._post_json(URL_DATA_COLLECTION_PV, body)
+调用：int, self._post_json, time.time
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+TelemetryClient.send_device_verify(self, uid: int, unid: int) → dict（L74）
+功能：极验设备验证特征打点 (/api/v620/datacollection/geetest/deviceVerify)
+输出表达式（静态）：self._post_json(URL_DEVICE_VERIFY, body)
+调用：int, self._post_json, [外部服务地址省略]ice.get
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+TelemetryClient.check_control_message(self) → dict（L83）
+功能：心跳与控制信令检查 ([外部服务地址省略])
+输出表达式（静态）：{'error': -1, 'message': str(e)}; {'status': resp.status, 'body': resp.read().decode('utf-8', errors='ignore')}
+调用：resp.read, resp.read().decode, str, urllib.request.Request, urllib.request.urlopen
+本函数捕获：Exception；显式抛出：无
+TelemetryClient.get_barrier_free_policy(self, netsec_client) → dict（L92）
+功能：拉取服务端无障碍服务检测与反辅助策略 (/api/v1/barrierFree/getBarrierFree)
+输出表达式（静态）：netsec_client.execute_request('GET', URL_BARRIER_FREE)
+调用：netsec_client.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+TelemetryClient.get_cheat_blacklist(self, netsec_client) → dict（L96）
+功能：拉取客户端黑名单应用与作弊工具包名特征库 (/api/v78/cheat/cheatlist)
+输出表达式（静态）：netsec_client.execute_request('POST', URL_CHEAT_LIST, body_plain={})
+调用：netsec_client.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+TelemetryClient.get_rank_list(self, netsec_client, rank_type: int = 1) → dict（L100）
+功能：跑后排行榜查询 (/api/v41/rank)
+输出表达式（静态）：netsec_client.execute_request('POST', URL_RANK_LIST, body_plain={'type': int(rank_type)})
+调用：int, netsec_client.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+TelemetryClient.get_credit_popup(self, netsec_client) → dict（L104）
+功能：信用分弹窗与风险审查 (/api/creditscore/v70390/popup)
+输出表达式（静态）：netsec_client.execute_request('GET', URL_CREDIT_POPUP)
+调用：netsec_client.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+
+文件：协议/7.3.92/telemetry/config.py
+导入依赖：core.config, os, sys

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="cn.local.fitness.TrackCodecTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-25T07:16:25" hostname="ce039c497676" time="0.073">
+  <properties/>
+  <testcase name="invalidCoordinateAndMalformedGpsAreRejected" classname="cn.local.fitness.TrackCodecTest" time="0.002"/>
+  <testcase name="subsecondPointsRoundTripInRecordJsonAndCsv" classname="cn.local.fitness.TrackCodecTest" time="0.027"/>
+  <testcase name="pythonGpsCsvAndRelativeCsvAreAccepted" classname="cn.local.fitness.TrackCodecTest" time="0.001"/>
+  <testcase name="nativeRecordImportKeepsSimulatedTestLabel" classname="cn.local.fitness.TrackCodecTest" time="0.025"/>
+  <testcase name="duplicateOrDecreasingTimeIsRejected" classname="cn.local.fitness.TrackCodecTest" time="0.001"/>
+  <testcase name="partialTotalSecondAndExcessPrecisionAreRejectedExplicitly" classname="cn.local.fitness.TrackCodecTest" time="0.0"/>
+  <testcase name="pythonGpsJsonIsReadOnlyAndRetainsMilliseconds" classname="cn.local.fitness.TrackCodecTest" time="0.017"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

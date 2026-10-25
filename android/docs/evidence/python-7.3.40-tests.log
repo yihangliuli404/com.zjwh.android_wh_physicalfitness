@@ -1,0 +1,13 @@
+test_coordinate_boundaries_and_non_finite_values (test_coordinate_consistency.CoordinateConsistencyTests.test_coordinate_boundaries_and_non_finite_values) ... ok
+test_coordinate_is_shared_value_object (test_coordinate_consistency.CoordinateConsistencyTests.test_coordinate_is_shared_value_object) ... ok
+test_empty_track_is_rejected (test_coordinate_consistency.CoordinateConsistencyTests.test_empty_track_is_rejected) ... ok
+test_first_track_point_offset_is_rejected (test_coordinate_consistency.CoordinateConsistencyTests.test_first_track_point_offset_is_rejected) ... ok
+test_fixed_point_must_belong_to_full_track (test_coordinate_consistency.CoordinateConsistencyTests.test_fixed_point_must_belong_to_full_track) ... ok
+test_missing_coordinate_fields_are_rejected (test_coordinate_consistency.CoordinateConsistencyTests.test_missing_coordinate_fields_are_rejected) ... ok
+test_sensitive_values_are_redacted (test_coordinate_consistency.CoordinateConsistencyTests.test_sensitive_values_are_redacted) ... ok
+test_track_and_record_share_anchor (test_coordinate_consistency.CoordinateConsistencyTests.test_track_and_record_share_anchor) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.012s
+
+OK

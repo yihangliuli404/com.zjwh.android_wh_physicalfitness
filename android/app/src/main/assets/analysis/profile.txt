@@ -1,0 +1,93 @@
+profile 源码分析
+ProfileClient 继承 BaseNetSecClient，读取服务器时间、个人及首页资料。get_server_time 接口失败会回退本机时间，因此返回模型不证明同步成功。档案失败通常返回 None。
+说明：索引基于 AST；不执行模块，不调用远端接口。参数列出名称、类型及默认值是否存在；字符串默认值不展示，避免散播协议常量。
+
+文件：协议/7.3.92/profile/__init__.py
+导入依赖：profile.client, profile.models
+
+文件：协议/7.3.92/profile/cli.py
+导入依赖：argparse, os, profile.client, sys
+main() → 源码未标注类型，见返回分支（L18）
+调用：ProfileClient, argparse.ArgumentParser, client.get_home_base_user_info, client.get_server_time, client.get_user_info, parser.add_argument, parser.parse_args, print
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+
+文件：协议/7.3.92/profile/client.py
+导入依赖：core.client, os, profile.config, profile.models, sys, time, typing
+类 ProfileClient（L23），父类：BaseNetSecClient
+ProfileClient.__init__(self, uid: Optional[Union[int, str]] = None, token: Optional[str] = None, unid: Optional[Union[int, str]] = None, device_config: Optional[Dict[str, Any]] = None) → 源码未标注类型，见返回分支（L26）
+调用：super, super().__init__
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+ProfileClient.get_server_time(self) → ServerTime（L33）
+功能：拉取服务端 GMT 时间戳并完成偏斜校准
+输出表达式（静态）：ServerTime.from_api(server_ms, t0); ServerTime.from_api(t0, t0)
+调用：ServerTime.from_api, int, isinstance, res.get, self.execute_request, time.time
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+ProfileClient.get_user_info(self) → Optional[UserProfileDetails]（L43）
+功能：拉取学生核心详细档案
+输出表达式（静态）：None; UserProfileDetails.from_api_data(res['data'])
+调用：UserProfileDetails.from_api_data, isinstance, res.get, self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+ProfileClient.get_home_base_user_info(self, target_uid: Optional[Union[int, str]] = None) → Optional[HomeBaseUserInfo]（L50）
+功能：拉取首页头像、学号与学院基本资料
+输出表达式（静态）：HomeBaseUserInfo.from_api_data(res['data']); None
+调用：HomeBaseUserInfo.from_api_data, isinstance, res.get, self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+ProfileClient.get_home_extended_info(self, target_uid: Optional[Union[int, str]] = None) → Optional[HomeExtendedInfo]（L61）
+功能：拉取信用分与跑步累计数据
+输出表达式（静态）：HomeExtendedInfo.from_api_data(res['data']); None
+调用：HomeExtendedInfo.from_api_data, isinstance, res.get, self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+ProfileClient.get_home_page(self) → dict（L72）
+输出表达式（静态）：self.execute_request('POST', '[外部服务地址省略]', body_plain={})
+调用：self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+ProfileClient.get_home_config(self) → dict（L75）
+输出表达式（静态）：self.execute_request('GET', '[外部服务地址省略]')
+调用：self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+ProfileClient.get_home_icon(self) → dict（L78）
+输出表达式（静态）：self.execute_request('GET', '[外部服务地址省略]')
+调用：self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+ProfileClient.get_homepage_bounce(self) → dict（L81）
+输出表达式（静态）：self.execute_request('POST', '[外部服务地址省略]', body_plain={})
+调用：self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+ProfileClient.get_module(self) → dict（L84）
+输出表达式（静态）：self.execute_request('POST', '[外部服务地址省略]', body_plain={})
+调用：self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+ProfileClient.warmup_dashboard_session(self) → dict（L87）
+输出表达式（静态）：{'home_page': self.get_home_page(), 'home_config': self.get_home_config(), 'home_icon': self.get_home_icon(), 'bounce': self.get_homepage_bounce(), 'm
+调用：self.get_home_config, self.get_home_icon, self.get_home_page, self.get_homepage_bounce, self.get_module
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+
+文件：协议/7.3.92/profile/config.py
+导入依赖：core.config, os, sys
+
+文件：协议/7.3.92/profile/models.py
+导入依赖：dataclasses, datetime, time, typing
+类 ServerTime（L9），父类：无
+数据字段：server_timestamp_ms: int; local_timestamp_ms: int; offset_seconds: float; server_datetime: str
+ServerTime.from_api(cls, server_ms: int, local_ms: Optional[int] = None) → 'ServerTime'（L17）
+输出表达式（静态）：cls(server_timestamp_ms=server_ms, local_timestamp_ms=local_ms, offset_seconds=offset, server_datetime=dt)
+调用：cls, datetime.datetime.fromtimestamp, datetime.datetime.fromtimestamp(server_ms / 1000.0).strftime, int, time.time
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+类 UserProfileDetails（L31），父类：无
+数据字段：uid: int; unid: int; name: str; username: str; student_id: str; campus_name: str; campus_id: str; depart: str; grade_class: str; major: str; sex: str; phone: str; raw: Dict[str, Any]
+UserProfileDetails.from_api_data(cls, data: Dict[str, Any]) → 'UserProfileDetails'（L48）
+输出表达式（静态）：cls(uid=data.get('uid', -1), unid=data.get('unid', -1), name=data.get('name', ''), username=data.get('username', ''), student_id=data.get('studentId',
+调用：cls, data.get, sex_map.get, str
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+类 HomeBaseUserInfo（L68），父类：无
+数据字段：uid: int; name: str; avatar_url: str; student_no: str; department_name: str; university_name: str; raw: Dict[str, Any]
+HomeBaseUserInfo.from_api_data(cls, data: Dict[str, Any]) → 'HomeBaseUserInfo'（L79）
+输出表达式（静态）：cls(uid=data.get('uid', -1), name=data.get('name', ''), avatar_url=data.get('avatar', '') or data.get('icon', ''), student_no=data.get('studentNo', ''
+调用：cls, data.get
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+类 HomeExtendedInfo（L92），父类：无
+数据字段：uid: int; credit_score: int; run_count: int; total_distance: float; raw: Dict[str, Any]
+HomeExtendedInfo.from_api_data(cls, data: Dict[str, Any]) → 'HomeExtendedInfo'（L101）
+输出表达式（静态）：cls(uid=data.get('uid', -1), credit_score=data.get('creditScore', 0) or data.get('score', 0), run_count=data.get('runCount', 0) or data.get('count', 0
+调用：cls, data.get, float
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无

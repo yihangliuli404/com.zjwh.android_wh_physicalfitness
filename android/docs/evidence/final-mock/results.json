@@ -1,0 +1,38 @@
+[
+  {
+    "check": "09-task-unsent",
+    "passed": true,
+    "statuses": [
+      "NOT_SENT",
+      "NOT_SENT",
+      "NOT_SENT"
+    ]
+  },
+  {
+    "check": "10-upload-only",
+    "passed": true,
+    "statuses": [
+      "SUCCESS",
+      "NOT_SENT",
+      "NOT_SENT"
+    ]
+  },
+  {
+    "check": "11-settlement-only",
+    "passed": true,
+    "statuses": [
+      "SUCCESS",
+      "SUCCESS",
+      "NOT_SENT"
+    ]
+  },
+  {
+    "check": "12-independent-sqlite-credit",
+    "passed": true,
+    "statuses": [
+      "SUCCESS",
+      "SUCCESS",
+      "SUCCESS"
+    ]
+  }
+]

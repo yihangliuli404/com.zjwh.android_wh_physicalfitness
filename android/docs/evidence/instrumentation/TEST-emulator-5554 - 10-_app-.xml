@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="cn.local.fitness.LocalMockDeviceTest" tests="3" failures="0" errors="0" skipped="0" time="12.58" timestamp="2026-10-25T07:18:01" hostname="localhost">
+  <properties>
+    <property name="device" value="emulator-5554 - 10" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="androidHttp200BusinessFailureNeverCreatesReceipt" classname="cn.local.fitness.LocalMockDeviceTest" time="3.281" />
+  <testcase name="loopbackHttpWithActualAndroidSqliteRequiresIndependentQuery" classname="cn.local.fitness.LocalMockDeviceTest" time="1.167" />
+  <testcase name="sqliteReceiptSurvivesClosingAndReopeningDatabase" classname="cn.local.fitness.LocalMockDeviceTest" time="0.181" />
+</testsuite>

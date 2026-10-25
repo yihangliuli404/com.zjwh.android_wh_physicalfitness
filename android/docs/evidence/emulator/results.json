@@ -1,0 +1,76 @@
+[
+  {
+    "check": "01-home",
+    "passed": true,
+    "expected": [
+      "本地运动实验室",
+      "完全离线"
+    ]
+  },
+  {
+    "check": "02-manual-record",
+    "passed": true,
+    "expected": [
+      "我的运动",
+      "手动记录·未认证",
+      "5′00″/公里"
+    ]
+  },
+  {
+    "check": "03-simulated-record",
+    "passed": true,
+    "expected": [
+      "本地模拟样本",
+      "模拟轨迹·仅本地"
+    ]
+  },
+  {
+    "check": "04-local-self-check",
+    "passed": true,
+    "expected": [
+      "通过 · 应用内离线自检",
+      "5 项检查通过"
+    ]
+  },
+  {
+    "check": "05-persisted-after-restart",
+    "passed": true,
+    "expected": [
+      "我的运动",
+      "本地模拟样本"
+    ]
+  },
+  {
+    "check": "06-calculator",
+    "passed": true,
+    "expected": [
+      "5′00″/公里",
+      "12.00 公里/小时"
+    ]
+  },
+  {
+    "check": "07-protocol-analysis",
+    "passed": true,
+    "expected": [
+      "静态分析",
+      "core"
+    ]
+  },
+  {
+    "check": "08-gps-analysis",
+    "passed": true,
+    "expected": [
+      "GPS 轨迹分析",
+      "导入 JSON / CSV 轨迹"
+    ]
+  },
+  {
+    "check": "09-task-unsent",
+    "passed": true,
+    "statuses": [
+      "NOT_SENT",
+      "NOT_SENT",
+      "NOT_SENT"
+    ]
+  }
+]

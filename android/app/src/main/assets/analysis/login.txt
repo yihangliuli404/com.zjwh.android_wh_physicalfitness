@@ -1,0 +1,148 @@
+login 源码分析
+LoginClient.login 编排 checkGeeUse、可选验证码、geevalidate、submit_login。captcha.py 通过 Node 子进程调用 Playwright/Chromium，解析 FINAL_RESULT。缺少执行文件、子进程超时或求解失败可能抛出异常。Android 不移植登录或验证码。
+说明：索引基于 AST；不执行模块，不调用远端接口。参数列出名称、类型及默认值是否存在；字符串默认值不展示，避免散播协议常量。
+
+文件：协议/7.3.92/login/__init__.py
+导入依赖：login.captcha, login.client, login.config, login.models
+
+文件：协议/7.3.92/login/captcha.py
+导入依赖：config, json, login.config, login.models, models, os, shutil, subprocess, typing
+类 GeetestV4Solver（L16），父类：无
+GeetestV4Solver.__init__(self, node_executable: Optional[str] = None, solver_script: Optional[str] = None) → 源码未标注类型，见返回分支（L19）
+调用：os.path.abspath, os.path.dirname, os.path.join, self._detect_node_executable
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+GeetestV4Solver._detect_node_executable() → str（L31）
+输出表达式（静态）：'node'; env_node; found; p
+调用：os.environ.get, os.path.isfile, shutil.which
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+GeetestV4Solver.solve(self, captcha_id: str = LOGIN_CAPTCHA_ID, timeout_sec: int = 60) → GeetestResult（L57）
+功能：调用无头 Chromium 求解极验滑块并解析结果
+输出表达式（静态）：GeetestResult(captcha_id=res.get('captcha_id', captcha_id), lot_number=res.get('lot_number', ''), pass_token=res.get('pass_token', ''), gen_time=res.g
+调用：FileNotFoundError, GeetestResult, RuntimeError, extra_node_paths.append, json.loads, len, line.startswith, line[len('FINAL_RESULT:'):].strip, os.environ.copy, os.path.abspath, os.path.dirname, os.path.isdir, os.path.isfile, os.path.join, os.pathsep.join, proc.stdout.splitlines, res.get, shutil.which, subprocess.run
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：FileNotFoundError, RuntimeError
+
+文件：协议/7.3.92/login/cli.py
+导入依赖：argparse, client, login.client, login.models, models, os, sys, time
+main() → 源码未标注类型，见返回分支（L24）
+调用：LoginClient, argparse.ArgumentParser, client.login, parser.add_argument, parser.parse_args, print, time.time
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+
+文件：协议/7.3.92/login/client.py
+导入依赖：base64, captcha, config, crypto, json, login.captcha, login.config, login.crypto, login.models, models, os, ssl, sys, time, typing, urllib.request, uuid
+类 LoginClient（L46），父类：无
+LoginClient.__init__(self, device_config: Optional[Dict[str, Any]] = None, solver: Optional[GeetestV4Solver] = None) → 源码未标注类型，见返回分支（L49）
+调用：GeetestV4Solver, NetSecClient, dict, [外部服务地址省略]ice_config.update, ssl.create_default_context
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+LoginClient.execute_request(self, url: str, body: Any, custom_headers: Optional[Dict[str, str]] = None) → Any（L60）
+功能：底层标准加解密请求管道
+输出表达式（静态）：biz_bytes.decode('utf-8'); inner; json.loads(biz_bytes.decode('utf-8')); resp_obj
+调用：aes128_cbc_decrypt, base64.b64decode, biz_bytes.decode, dec_h.decode, dict, headers.update, int, json.dumps, json.dumps(b_wire).encode, json.loads, resp.read, resp.read().decode, self.crypto.encrypt_request, str, time.time, urllib.request.Request, urllib.request.urlopen, uuid.uuid4
+本函数捕获：Exception；显式抛出：无
+LoginClient.check_gee_use(self, username: str, session_uuid: str) → Dict[str, Any]（L104）
+功能：发起安全初审
+输出表达式（静态）：self.execute_request(URL_CHECK_GEE_USE, body)
+调用：self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+LoginClient.gee_validate(self, gt_res: GeetestResult, session_uuid: str, username: str) → Dict[str, Any]（L109）
+功能：向服务端上报极验凭据并进行二次绑定校验
+输出表达式（静态）：self.execute_request(URL_GEE_VALIDATE, payload)
+调用：gt_res.to_validate_payload, self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+LoginClient.submit_login(self, username: str, password: str, session_uuid: str) → Dict[str, Any]（L114）
+功能：提交基础认证凭据与设备信息
+输出表达式（静态）：self.execute_request(URL_LOGIN, login_body, custom_headers=custom_headers)
+调用：base64.b64encode, base64.b64encode(auth_raw).decode, f'{username}:{password}'.encode, [外部服务地址省略]ice_config.get, self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+LoginClient.login(self, username: str, password: str, progress_callback: Optional[Callable[[str], None]] = None) → LoginResult（L129）
+功能：端到端登录流程 (checkGeeUse -> solve_captcha -> geevalidate -> login)
+输出表达式（静态）：LoginResult(success=False, error_code=code, message=msg, raw=login_res); LoginResult(success=False, error_code=val_res.get('error', -1) if isinstance(val_res, dict) else -1, message=f'极验二次校验失败: {err_msg}', raw=val_res); LoginResult(success=True, error_code=10000, message='登录成功', user=user_prof, raw=login_res)
+调用：LoginResult, UserProfile.from_api_data, chk_res.get, isinstance, log, login_res.get, progress_callback, range, self.check_gee_use, self.gee_validate, self.solver.solve, self.submit_login, str, time.sleep, uuid.uuid4, val_res.get
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+
+文件：协议/7.3.92/login/config.py
+导入依赖：
+
+文件：协议/7.3.92/login/crypto.py
+导入依赖：base64, collections, hashlib, json, os, pathlib, random, struct, subprocess, time, uuid
+xtime(a) → 源码未标注类型，见返回分支（L38）
+输出表达式（静态）：(a << 1 ^ 27) & 255 if a & 128 else a << 1 & 255
+调用：无显式函数调用
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+mul_gf(a, b) → 源码未标注类型，见返回分支（L41）
+输出表达式（静态）：res
+调用：range, xtime
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+key_expansion_128(key: bytes) → 源码未标注类型，见返回分支（L49）
+输出表达式（静态）：w
+调用：int.from_bytes, range, w.append
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+aes128_encrypt_block(block: bytes, round_keys) → 源码未标注类型，见返回分支（L63）
+输出表达式（静态）：bytes(state)
+调用：bytes, list, range, xtime
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+aes128_decrypt_block(block: bytes, round_keys) → 源码未标注类型，见返回分支（L100）
+输出表达式（静态）：bytes(state)
+调用：bytes, list, mul_gf, range
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+aes128_cbc_encrypt(data: bytes, key: bytes, iv: bytes = bytes(16)) → bytes（L137）
+输出表达式（静态）：bytes(out)
+调用：aes128_encrypt_block, bytearray, bytes, key_expansion_128, len, out.extend, range, zip
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+aes128_cbc_decrypt(data: bytes, key: bytes, iv: bytes = bytes(16)) → bytes（L150）
+输出表达式（静态）：bytes(out); bytes(out[:-pad_len])
+调用：aes128_decrypt_block, bytearray, bytes, key_expansion_128, len, out.extend, range, zip
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+rsa_pkcs1_v15_encrypt(msg: bytes, n: int, e: int, k_len: int = 128) → bytes（L165）
+输出表达式（静态）：c_int.to_bytes(k_len, 'big')
+调用：bytearray, bytes, c_int.to_bytes, int.from_bytes, len, os.urandom, pow, ps.append
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+_byte_hash(data: bytes) → int（L176）
+输出表达式（静态）：h
+调用：无显式函数调用
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+_feistel_transform(s0: int, s1: int, s2: int, s3: int) → 源码未标注类型，见返回分支（L182）
+输出表达式（静态）：(new_s0, new_s1, new_s2, new_s3)
+调用：无显式函数调用
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+_final_mix(s0: int, s1: int, s2: int, s3: int) → bytes（L196）
+输出表达式（静态）：struct.pack('<IIII', d, a, b, c)
+调用：struct.pack
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+response_kdf(kd1, kd2, kd3, kd4) → bytes（L206）
+输出表达式（静态）：_final_mix(s0, s1, s2, s3)
+调用：_byte_hash, _feistel_transform, _final_mix, isinstance, kd1.encode, kd2.encode, kd3.encode, kd4.encode
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+类 NetSecClient（L220），父类：无
+NetSecClient.__init__(self) → 源码未标注类型，见返回分支（L221）
+调用：base64.b64decode, int.from_bytes
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+NetSecClient.encrypt_request(self, data_obj) → 源码未标注类型，见返回分支（L229）
+输出表达式（静态）：(wire_req, resp_aes_key)
+调用：''.join, ''.join((random.choice('abcdefghijklmnopqrstuvwxyz0123456789') for _ in range(16))).encode, aes128_cbc_encrypt, base64.b64encode, base64.b64encode(ciphertext).decode, base64.b64encode(data_obj.encode('utf-8')).decode, base64.b64encode(enc_k).decode, base64.b64encode(json.dumps(data_obj, separators=(',', ':')).encode('utf-8')).decode, chr, collections.OrderedDict, data_obj.encode, hashlib.md5, hashlib.md5(inner_bytes).hexdigest, hashlib.md5(inner_bytes).hexdigest().lower, inner_json.encode, int, isinstance, json.dumps, json.dumps(data_obj, separators=(',', ':')).encode, random.choice, range, response_kdf, rsa_pkcs1_v15_encrypt, str, str(uuid.uuid4()).replace, time.time, uuid.uuid4
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+NetSecClient.decrypt_response(self, resp_dict, resp_aes_key) → 源码未标注类型，见返回分支（L272）
+输出表达式（静态）：biz_bytes.decode('utf-8', errors='replace'); json.loads(biz_bytes.decode('utf-8', errors='replace')); resp_dict
+调用：aes128_cbc_decrypt, base64.b64decode, biz_bytes.decode, decrypted.decode, json.loads
+本函数捕获：Exception；显式抛出：无
+compute_token_sign(params, salt = 字符串默认值) → 源码未标注类型，见返回分支（L285）
+输出表达式（静态）：hashlib.md5(s.encode('utf-8')).hexdigest().lower()
+调用：'&'.join, hashlib.md5, hashlib.md5(s.encode('utf-8')).hexdigest, hashlib.md5(s.encode('utf-8')).hexdigest().lower, k.lower, params.items, s.encode, str, valid_items.sort, x[0].lower
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+
+文件：协议/7.3.92/login/models.py
+导入依赖：dataclasses, typing
+类 GeetestResult（L7），父类：无
+数据字段：captcha_id: str; lot_number: str; pass_token: str; gen_time: str; captcha_output: str
+GeetestResult.to_validate_payload(self, session_uuid: str, username: str) → Dict[str, Any]（L15）
+功能：生成发送至 /api/v70270/security/geevalidate 的载荷
+输出表达式（静态）：{'lotNumber': self.lot_number, 'captchaOutput': self.captcha_output, 'passToken': self.pass_token, 'genTime': self.gen_time, 'isOffline': False, 'osTy
+调用：无显式函数调用
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+类 UserProfile（L31），父类：无
+数据字段：uid: int; unid: int; name: str; username: str; campus_name: str; campus_id: str; depart: str; grade_class: str; sex: str; token: str; raw: Dict[str, Any]
+UserProfile.from_api_data(cls, data: Dict[str, Any]) → 'UserProfile'（L46）
+输出表达式（静态）：cls(uid=data.get('uid', -1), unid=data.get('unid', -1), name=data.get('name', ''), username=data.get('username', ''), campus_name=data.get('campusName
+调用：cls, data.get, sex_map.get
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+类 LoginResult（L64），父类：无
+数据字段：success: bool; error_code: int; message: str; user: Optional[UserProfile]; raw: Optional[Dict[str, Any]]

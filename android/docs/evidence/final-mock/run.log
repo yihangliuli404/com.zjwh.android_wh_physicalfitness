@@ -1,0 +1,5 @@
+PASS 09-task-unsent
+PASS 10-upload-only
+PASS 11-settlement-only
+PASS 12-independent-sqlite-credit
+4 complete smoke checks passed on software emulator; no real platform calls.

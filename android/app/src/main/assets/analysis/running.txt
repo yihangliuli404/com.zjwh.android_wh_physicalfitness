@@ -1,0 +1,146 @@
+running 源码分析
+RunningTrackBuilder 构造 GpsPoint/FivePoint、10 秒分桶、结算字典及逐字段 gzip+Base64 OBS 数据；RunningClient 同步执行预签名、PUT、结算和历史回查。没有持久任务队列。回查缺失时默认 is_valid=True，不能作为真实入账证据。Android 仅重写本地几何与 Mock 三阶段。
+说明：索引基于 AST；不执行模块，不调用远端接口。参数列出名称、类型及默认值是否存在；字符串默认值不展示，避免散播协议常量。
+
+文件：协议/7.3.92/running/__init__.py
+导入依赖：running.builder, running.client, running.models
+
+文件：协议/7.3.92/running/builder.py
+导入依赖：base64, gzip, hashlib, json, math, running.config, running.consistency, running.models, time, typing, uuid
+compute_sport_signature(field_map: Dict[str, Union[str, int, float, bool, None]], salt: str = SPORT_STATIC_SALT) → str（L15）
+功能：计算 31 参数运动学加盐 MD5 校验签名
+输出表达式（静态）：hashlib.md5(to_hash).hexdigest().lower()
+调用：'&'.join, (canonical_str + salt).encode, field_map.items, hashlib.md5, hashlib.md5(to_hash).hexdigest, hashlib.md5(to_hash).hexdigest().lower, isinstance, k.lower, str, str(v).lower, valid_items.append, valid_items.sort, x[0].lower
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+compute_original_sign(field_map: Dict[str, Union[str, int, float, bool, None]]) → str（L32）
+功能：计算原始参数键值对拼接串
+输出表达式（静态）：'&'.join((f'{k}={v}' for k, v in valid_items))
+调用：'&'.join, field_map.items, isinstance, k.lower, str, str(v).lower, valid_items.append, valid_items.sort
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+gzip_base64_encode(data: Union[str, bytes]) → str（L46）
+功能：Gzip 压缩并转为 Base64 字符串
+输出表达式（静态）：base64.b64encode(compressed).decode('ascii')
+调用：base64.b64encode, base64.b64encode(compressed).decode, data.encode, [外部服务地址省略]press, isinstance
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+类 RunningTrackBuilder（L56），父类：无
+RunningTrackBuilder.__init__(self, uid: int, unid: int, sport_type: int = 1, uuid_str: Optional[str] = None) → 源码未标注类型，见返回分支（L59）
+调用：int, str, uuid.uuid4
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+RunningTrackBuilder.generate_track_around_points(self, center_lat: float, center_lng: float, checkpoints: Optional[List[Dict[str, Any]]] = None, total_distance_m: int = 2100, total_time_sec: int = 760, start_time_ms: int = 0) → Tuple[List[GpsPoint], List[FivePoint]]（L66）
+功能：根据模式 (sportType=1 计分跑 vs sportType=6 自由跑) 生成真实平滑的 GPS 坐标序列
+输出表达式（静态）：(points, five_points)
+调用：FivePoint, GpsPoint, bool, check_track, cp.get, distance, enumerate, five_points.append, float, len, math.cos, math.sin, points.append, range, round, sample_route, str, validate_totals, waypoints.append
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+RunningTrackBuilder.build_submission_payload(self, total_distance_m: int, total_time_sec: int, total_steps: int, start_time_ms: int, stop_time_ms: int, gps_points: List[GpsPoint], five_points: List[FivePoint], sel_distance_m: int = 2000, sel_run_time_s: int = 0, calorie: int = 135, avg_power: int = 150, run_area_id: int = -1, geo_fences_json: Optional[str] = None, policy: int = 1) → Tuple[dict, dict, str]（L141）
+功能：组装完整的 save/record 报文、OBS 上传大对象与相对路径
+输出表达式（静态）：(save_record, obs_payload, object_key)
+调用：GpsPoint, SpeedBucket, StepBucket, b.to_dict, check_track, compute_original_sign, compute_sport_signature, enumerate, gzip_base64_encode, json.dumps, p.to_dict, round, speed_buckets.append, step_buckets.append, str, time.localtime, time.strftime, time_buckets, validate_totals
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+
+文件：协议/7.3.92/running/cli.py
+导入依赖：argparse, os, running.client, sys
+main() → 源码未标注类型，见返回分支（L18）
+调用：RunningClient, argparse.ArgumentParser, client.execute_full_run, parser.add_argument, parser.parse_args, print
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+
+文件：协议/7.3.92/running/client.py
+导入依赖：core.client, history.client, json, os, policy.client, profile.client, random, running.builder, running.config, running.models, sys, telemetry.client, time, typing, urllib.request, uuid
+类 RunningClient（L32），父类：BaseNetSecClient
+RunningClient.__init__(self, uid: Optional[Union[int, str]] = None, token: Optional[str] = None, unid: Optional[Union[int, str]] = None, device_config: Optional[Dict[str, Any]] = None) → 源码未标注类型，见返回分支（L35）
+调用：HistoryClient, PolicyClient, ProfileClient, TelemetryClient, super, super().__init__
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+RunningClient.set_credentials(self, uid: Optional[Union[int, str]], token: Optional[str], unid: Optional[Union[int, str]] = None) → 源码未标注类型，见返回分支（L46）
+调用：self.history.set_credentials, self.policy.set_credentials, self.profile.set_credentials, super, super().set_credentials
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+RunningClient.request_obs_upload_url(self, object_key: str) → dict（L52）
+功能：向网关申请华为云 OBS 预签名上传地址 (/api/obs/temporary/url)
+输出表达式（静态）：res if isinstance(res, dict) else {'error': -1, 'message': str(res)}; {'error': 10000, 'data': data}
+调用：isinstance, json.loads, res.get, self.execute_request, str
+本函数捕获：Exception；显式抛出：无
+RunningClient.upload_to_obs(self, signed_url: str, signed_headers: dict, payload: dict) → dict（L71）
+功能：直接以 PUT 请求向华为云 OBS 存储桶异步推送轨迹与步频载荷
+输出表达式（静态）：{'error': -1, 'message': f'OBS 网络异常: {e}'}; {'error': 10000, 'message': 'OBS 上传成功'}; {'error': e.code, 'message': f'OBS 上传失败: {e.reason}'}; {'error': resp.status, 'message': f'OBS HTTP {resp.status}'}
+调用：dict, json.dumps, json.dumps(payload, separators=(',', ':'), ensure_ascii=False).encode, urllib.request.Request, urllib.request.urlopen
+本函数捕获：Exception, urllib.error.HTTPError；显式抛出：无
+RunningClient.submit_record(self, save_body: dict) → dict（L86）
+功能：核心跑步记录结算上报 (/api/v70260/runnings/save/record)
+输出表达式（静态）：self.execute_request('POST', URL_SAVE_RECORD, body_plain=save_body)
+调用：self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+RunningClient.get_rundetail_config(self, sport_type: int = 1) → dict（L90）
+功能：拉取跑步详情页配置 (/api/v70340/activity/rundetail/config)
+输出表达式（静态）：self.execute_request('GET', f'{URL_RUN_DETAIL_CONFIG}?sportType={sport_type}')
+调用：self.execute_request
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+RunningClient.execute_full_run(self, target_distance_m: int = 2100, target_time_sec: int = 780, sport_type: int = 1, progress_callback: Optional[Callable[[str], None]] = None) → RunningSubmissionResult（L94）
+功能：按照 7.3.92 实机抓包全时序规范执行拟人跑步结算全流程
+输出表达式（静态）：RunningSubmissionResult(success=False, error_code=code, message=msg, raw=sub_res); RunningSubmissionResult(success=False, message='未取得学校规则，停止提交'); RunningSubmissionResult(success=False, message='缺少鉴权凭据 (uid/token)'); RunningSubmissionResult(success=False, message=f'学校规则无法解析: {exc}'); RunningSubmissionResult(success=False, message=f'推送到 OBS 失败: {err}', raw=put_res); RunningSubmissionResult(success=False, message=f'本地一致性校验失败: {exc}'); RunningSubmissionResult(success=False, message=f'申请 OBS 上传凭证失败: {err}', raw=obs_res); RunningSubmissionResult(success=True, rrid=rrid, error_code=10000, message='跑步提交与结算完成', total_distance=float(target_distance_m), total_time=int(target
+调用：(rule.raw.get('runRuleModel') or {}).get, RunningSubmissionResult, RunningTrackBuilder, ValueError, builder.build_submission_payload, builder.generate_track_around_points, data.get, float, int, isinstance, json.dumps, len, log, obs_info.get, obs_res.get, point.as_checkpoint, progress_callback, put_res.get, random.uniform, rule.raw.get, self.get_rundetail_config, self.history.get_one_record, self.policy.get_checkpoints_for_run, self.policy.get_geo_fence, self.policy.get_run_policy, self.profile.get_server_time, self.request_obs_upload_url, self.submit_record, self.telemetry.send_page_exposure, self.telemetry.send_startup_pv, self.upload_to_obs, str, sub_res.get, time.sleep, uuid.uuid4
+本函数捕获：(TypeError, ValueError), (TypeError, ValueError, AttributeError)；显式抛出：ValueError
+
+文件：协议/7.3.92/running/config.py
+导入依赖：core.config, os, sys
+
+文件：协议/7.3.92/running/consistency.py
+导入依赖：bisect, math
+coordinate(lat, lon) → 源码未标注类型，见返回分支（L8）
+输出表达式（静态）：(lat, lon)
+调用：ValueError, float, isinstance, math.isfinite
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：ValueError
+distance(a, b) → 源码未标注类型，见返回分支（L17）
+输出表达式（静态）：EARTH_RADIUS_M * 2 * math.asin(min(1.0, math.sqrt(max(0.0, h))))
+调用：coordinate, map, math.asin, math.cos, math.sin, math.sqrt, max, min
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+interpolate(a, b, fraction) → 源码未标注类型，见返回分支（L24）
+输出表达式（静态）：(math.degrees(math.atan2(z, math.hypot(x, y))), math.degrees(math.atan2(y, x))); a; b
+调用：ValueError, abs, distance, math.atan2, math.cos, math.degrees, math.hypot, math.radians, math.sin, range, xyz.append
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：ValueError
+validate_totals(seconds, steps, start, stop, meters) → 源码未标注类型，见返回分支（L43）
+调用：ValueError, any, isinstance, math.isfinite
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：ValueError
+sample_route(waypoints, meters, seconds, start, require_all = True) → 源码未标注类型，见返回分支（L54）
+输出表达式（静态）：[(lat, lon, start + elapsed) for elapsed, (lat, lon) in sorted(samples.items())]
+调用：ValueError, bisect.bisect_right, coordinate, corner_times.add, cumulative.append, distance, float, interpolate, len, max, min, range, round, route.append, route.pop, samples.items, set, sorted, sum, validate_totals, vertices.append, zip
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：ValueError
+check_track(points, meters, seconds, start, stop, fixed_points = ()) → 源码未标注类型，见返回分支（L102）
+输出表达式（静态）：actual
+调用：ValueError, abs, any, coordinate, distance, isinstance, len, math.isfinite, max, sum, validate_totals, zip
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：ValueError
+time_buckets(seconds, steps, start, stop, meters) → 源码未标注类型，见返回分支（L121）
+调用：min, range, round, validate_totals
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+
+文件：协议/7.3.92/running/models.py
+导入依赖：dataclasses, typing
+类 GpsPoint（L7），父类：无
+数据字段：lat: float; lon: float; time: int; speed: float; accuracy: float; isValid: bool
+GpsPoint.to_dict(self) → dict（L16）
+输出表达式（静态）：{'lat': self.lat, 'lon': self.lon, 'time': self.time, 'speed': self.speed, 'accuracy': self.accuracy, 'isValid': self.isValid}
+调用：无显式函数调用
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+类 FivePoint（L28），父类：无
+数据字段：lat: float; lon: float; isFixed: int; isPass: bool; pointName: str; position: int; raw: Optional[Dict[str, Any]]
+FivePoint.to_dict(self) → dict（L38）
+输出表达式（静态）：result
+调用：dict, result.update
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+类 StepBucket（L52），父类：无
+数据字段：stepsNum: int; beginTime: int; endTime: int; flag: int; maxDiff: float; minDiff: float; avgDiff: float; state: int; queueNum: int
+StepBucket.__init__(self, stepsNum: int = 0, beginTime: int = 0, endTime: int = 0, flag: int = 0, maxDiff: float = 0.0, minDiff: float = 0.0, avgDiff: float = 0.0, state: int = 0, queueNum: int = 1, steps_num: Optional[int] = None, begin_time: Optional[int] = None, end_time: Optional[int] = None, max_diff: Optional[float] = None, min_diff: Optional[float] = None, avg_diff: Optional[float] = None, queue_num: Optional[int] = None) → 源码未标注类型，见返回分支（L64）
+调用：无显式函数调用
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+StepBucket.to_dict(self) → dict（L81）
+输出表达式（静态）：{'stepsNum': self.stepsNum, 'beginTime': self.beginTime, 'endTime': self.endTime, 'flag': self.flag, 'maxDiff': self.maxDiff, 'minDiff': self.minDiff,
+调用：无显式函数调用
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+类 SpeedBucket（L96），父类：无
+数据字段：distance: float; beginTime: int; endTime: int; flag: int; state: int; queueNum: int
+SpeedBucket.__init__(self, distance: float = 0.0, beginTime: int = 0, endTime: int = 0, flag: int = 0, state: int = 0, queueNum: int = 1, begin_time: Optional[int] = None, end_time: Optional[int] = None, queue_num: Optional[int] = None) → 源码未标注类型，见返回分支（L105）
+调用：无显式函数调用
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+SpeedBucket.to_dict(self) → dict（L116）
+输出表达式（静态）：{'distance': self.distance, 'beginTime': self.beginTime, 'endTime': self.endTime, 'flag': self.flag, 'state': self.state, 'queueNum': self.queueNum}
+调用：无显式函数调用
+本函数捕获：无显式捕获，异常可能向上传播；显式抛出：无
+类 RunningSubmissionResult（L128），父类：无
+数据字段：success: bool; rrid: Optional[int]; error_code: int; message: str; total_distance: float; total_time: int; is_valid: bool; raw: Dict[str, Any]

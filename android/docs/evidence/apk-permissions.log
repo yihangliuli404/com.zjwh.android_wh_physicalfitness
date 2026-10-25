@@ -1,0 +1,4 @@
+package: cn.local.fitness
+uses-permission: name='android.permission.INTERNET'
+permission: cn.local.fitness.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+uses-permission: name='cn.local.fitness.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'

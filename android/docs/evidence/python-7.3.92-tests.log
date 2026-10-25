@@ -1,0 +1,30 @@
+test_ambiguous_area_and_missing_rule_prevent_point_request (test_checkpoints.CheckpointTests.test_ambiguous_area_and_missing_rule_prevent_point_request) ... ok
+test_counted_run_fetches_official_points_and_reuses_uuid (test_checkpoints.CheckpointTests.test_counted_run_fetches_official_points_and_reuses_uuid) ... ok
+test_error_empty_and_bad_coordinates_not_success (test_checkpoints.CheckpointTests.test_error_empty_and_bad_coordinates_not_success) ... ok
+test_full_request_body_and_fixed_path_key (test_checkpoints.CheckpointTests.test_full_request_body_and_fixed_path_key) ... ok
+test_geofence_lon_and_lng_preserve_gcj_anchor (test_checkpoints.CheckpointTests.test_geofence_lon_and_lng_preserve_gcj_anchor) ... ok
+test_missing_anchor_and_invalid_distance_prevent_network (test_checkpoints.CheckpointTests.test_missing_anchor_and_invalid_distance_prevent_network) ... ok
+test_missing_school_rule_stops_before_upload (test_checkpoints.CheckpointTests.test_missing_school_rule_stops_before_upload) ... ok
+test_official_metadata_survives_builder_and_obs (test_checkpoints.CheckpointTests.test_official_metadata_survives_builder_and_obs) ... ok
+test_payload_shapes_and_metadata_preserved (test_checkpoints.CheckpointTests.test_payload_shapes_and_metadata_preserved) ... ok
+test_policy_minimum_distance_and_selected_area (test_checkpoints.CheckpointTests.test_policy_minimum_distance_and_selected_area) ... ok
+test_query_only_cli_never_submits (test_checkpoints.CheckpointTests.test_query_only_cli_never_submits) ... ok
+test_history_cli_formats_rows_and_handles_bad_payload (test_history_cli.HistoryCliTests.test_history_cli_formats_rows_and_handles_bad_payload) ... ok
+test_list_and_legacy_envelope (test_history_cli.HistoryCliTests.test_list_and_legacy_envelope) ... ok
+test_malformed_response_is_not_silently_empty (test_history_cli.HistoryCliTests.test_malformed_response_is_not_silently_empty) ... ok
+test_normal_status_does_not_override_incomplete_flag (test_history_cli.HistoryCliTests.test_normal_status_does_not_override_incomplete_flag) ... ok
+test_inconsistent_track_cannot_be_packaged (test_run_consistency.RunConsistencyTests.test_inconsistent_track_cannot_be_packaged) ... ok
+test_invalid_input_rejected (test_run_consistency.RunConsistencyTests.test_invalid_input_rejected) ... ok
+test_partial_duration_and_shorter_template_repeated_laps (test_run_consistency.RunConsistencyTests.test_partial_duration_and_shorter_template_repeated_laps) ... ok
+test_partial_last_bucket_is_contiguous_and_lossless (test_run_consistency.RunConsistencyTests.test_partial_last_bucket_is_contiguous_and_lossless) ... ok
+test_real_checkpoint_coordinates_preserved_and_visited (test_run_consistency.RunConsistencyTests.test_real_checkpoint_coordinates_preserved_and_visited) ... ok
+test_reported_2150m_760s_2900step_case (test_run_consistency.RunConsistencyTests.test_reported_2150m_760s_2900step_case) ... ok
+test_route_too_short_for_supplied_points_is_rejected (test_run_consistency.RunConsistencyTests.test_route_too_short_for_supplied_points_is_rejected) ... ok
+test_short_free_run_does_not_require_full_template_loop (test_run_consistency.RunConsistencyTests.test_short_free_run_does_not_require_full_template_loop) ... ok
+test_validation_failure_prevents_obs_and_settlement (test_run_consistency.RunConsistencyTests.test_validation_failure_prevents_obs_and_settlement) ... ok
+test_zero_checkpoint_coordinate_is_not_replaced_by_center (test_run_consistency.RunConsistencyTests.test_zero_checkpoint_coordinate_is_not_replaced_by_center) ... ok
+
+----------------------------------------------------------------------
+Ran 25 tests in 0.305s
+
+OK
